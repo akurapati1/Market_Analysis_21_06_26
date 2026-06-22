@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Briefing — June 22, 2026</title>
+<style>
+  :root[data-theme="dark"] {
+    --bg: #0f1117; --surface: #1a1d27; --card: #1e2235; --card2: #21253a;
+    --border: #2d3348; --text: #e2e8f0; --muted: #8892a4;
+    --green: #22c55e; --red: #ef4444; --gold: #f59e0b; --blue: #3b82f6;
+    --purple: #a855f7; --teal: #14b8a6; --orange: #f97316;
+    --green-bg: rgba(34,197,94,0.08); --red-bg: rgba(239,68,68,0.08);
+    --gold-bg: rgba(245,158,11,0.10); --watch-bg: rgba(100,116,139,0.07);
+    --purple-bg: rgba(168,85,247,0.08);
+  }
+  :root[data-theme="light"] {
+    --bg: #f8fafc; --surface: #ffffff; --card: #f1f5f9; --card2: #e8edf5;
+    --border: #e2e8f0; --text: #0f172a; --muted: #64748b;
+    --green: #16a34a; --red: #dc2626; --gold: #d97706; --blue: #2563eb;
+    --purple: #7c3aed; --teal: #0d9488; --orange: #ea580c;
+    --green-bg: rgba(22,163,74,0.06); --red-bg: rgba(220,38,38,0.06);
+    --gold-bg: rgba(217,119,6,0.08); --watch-bg: rgba(100,116,139,0.05);
+    --purple-bg: rgba(124,58,237,0.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.55; }
+
+  /* ── HEADER ── */
+  .header { background: var(--surface); border-bottom: 2px solid var(--border); padding: 14px 24px; position: sticky; top: 0; z-index: 200; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; }
+  .header h1 { font-size: 1.35rem; font-weight: 800; }
+  .header h1 .accent { color: var(--gold); }
+  .header-meta { font-size: 0.72rem; color: var(--muted); margin-top: 3px; }
+  .market-tone { font-size: 0.82rem; color: var(--teal); margin-top: 5px; font-style: italic; }
+  .theme-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.78rem; white-space: nowrap; }
+  .stats-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .stat-chip { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 3px 11px; font-size: 0.72rem; color: var(--muted); }
+  .stat-chip b { color: var(--text); }
+
+  /* ── NAV TABS ── */
+  .nav-tabs { display: flex; gap: 4px; padding: 12px 24px 0; background: var(--surface); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .nav-tab { padding: 8px 16px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; background: none; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* ── SECTIONS ── */
+  .section { display: none; padding: 24px 16px; max-width: 1450px; margin: 0 auto; }
+  .section.active { display: block; }
+  .section-title { font-size: 1.05rem; font-weight: 700; color: var(--text); margin: 28px 0 14px; padding-bottom: 8px; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .section-title:first-child { margin-top: 0; }
+  .section-title .emoji { font-size: 1.15rem; }
+
+  /* ── CAP GRID (Mode B) ── */
+  .cap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px; }
+  .cap-col-title { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding: 8px 12px; background: var(--surface); border-radius: 6px; border: 1px solid var(--border); margin-bottom: 10px; }
+
+  /* ── PICK CARDS (Mode B) ── */
+  .pick-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 15px; margin-bottom: 10px; }
+  .pick-card.surge  { border-left: 4px solid var(--gold);   background: var(--gold-bg);  }
+  .pick-card.gain   { border-left: 4px solid var(--green);  background: var(--green-bg); }
+  .pick-card.fall   { border-left: 4px solid var(--red);    background: var(--red-bg);   }
+  .pick-card.watch  { border-left: 4px solid var(--muted);  background: var(--watch-bg); }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+  .ticker-block .ticker { font-size: 1.05rem; font-weight: 800; }
+  .ticker-block .cname  { font-size: 0.76rem; color: var(--muted); margin-top: 1px; }
+  .price-block { text-align: right; }
+  .price-block .price { font-size: 0.95rem; font-weight: 700; }
+  .price-block .chg.pos { color: var(--green); font-size: 0.75rem; }
+  .price-block .chg.neg { color: var(--red);   font-size: 0.75rem; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+  .badge { border-radius: 4px; padding: 2px 7px; font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; border: 1px solid; }
+  .b-surge     { background: rgba(245,158,11,0.18); color: var(--gold);   border-color: var(--gold);   }
+  .b-gain      { background: rgba(34,197,94,0.15);  color: var(--green);  border-color: var(--green);  }
+  .b-fall      { background: rgba(239,68,68,0.15);  color: var(--red);    border-color: var(--red);    }
+  .b-watch     { background: rgba(100,116,139,0.15); color: var(--muted); border-color: var(--muted);  }
+  .b-reversal  { background: rgba(168,85,247,0.15); color: var(--purple); border-color: var(--purple); }
+  .b-unconf    { background: rgba(249,115,22,0.12); color: var(--orange); border-color: var(--orange); }
+  .b-cap       { background: rgba(59,130,246,0.15); color: var(--blue);   border-color: var(--blue);   }
+  .b-catalyst  { background: rgba(20,184,166,0.15); color: var(--teal);   border-color: var(--teal);   }
+  .b-geo       { background: rgba(168,85,247,0.12); color: var(--purple); border-color: var(--purple); }
+  .clabel { font-size: 0.67rem; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.06em; margin-top: 8px; margin-bottom: 2px; }
+  .ctext  { font-size: 0.80rem; color: var(--text); line-height: 1.5; }
+  .ctext a { color: var(--blue); text-decoration: none; }
+  .ctext a:hover { text-decoration: underline; }
+  .iss-row { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); }
+  .iss-lbl { font-size: 0.67rem; color: var(--muted); }
+  .iss-comp { font-size: 0.67rem; background: var(--surface); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; }
+  .iss-total { font-size: 0.78rem; font-weight: 800; color: var(--gold); }
+
+  /* ── GLOBAL PREDICTIONS (Mode A) ── */
+  .pred-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+  .pred-col-title { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding: 8px 12px; background: var(--surface); border-radius: 6px; border: 1px solid var(--border); margin-bottom: 10px; }
+  .global-card { background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+  .global-card.rise { border-left-color: var(--green); background: var(--green-bg); }
+  .global-card.fall { border-left-color: var(--red);   background: var(--red-bg);   }
+  .score-pill { font-size: 0.75rem; font-weight: 800; padding: 3px 9px; border-radius: 12px; }
+  .score-pill.pos { background: rgba(34,197,94,0.2); color: var(--green); }
+  .score-pill.neg { background: rgba(239,68,68,0.2); color: var(--red); }
+
+  /* ── GEOPOLITICAL CARDS ── */
+  .geo-card { background: var(--card2); border: 1px solid var(--border); border-left: 4px solid var(--purple); border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+  .geo-theme { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .geo-theme .icon { font-size: 1.1rem; }
+  .geo-sub { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin: 10px 0 5px; }
+  .geo-item { font-size: 0.8rem; padding: 4px 0; border-bottom: 1px solid var(--border); }
+  .geo-item:last-child { border-bottom: none; }
+  .geo-win { color: var(--green); font-weight: 700; }
+  .geo-lose { color: var(--red); font-weight: 700; }
+
+  /* ── NEWS CARDS ── */
+  .news-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 13px; margin-bottom: 10px; }
+  .news-card .nhead { font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
+  .news-card .nbody { font-size: 0.80rem; color: var(--muted); line-height: 1.5; }
+  .news-card .nsrc  { font-size: 0.72rem; margin-top: 6px; }
+  .news-card .nsrc a { color: var(--blue); text-decoration: none; }
+
+  /* ── SMALL CAP SPOTLIGHT ── */
+  .spot-card { background: var(--card); border: 1px solid var(--purple); border-left: 4px solid var(--purple); border-radius: 10px; padding: 13px; margin-bottom: 10px; background: var(--purple-bg); }
+  .spot-head { display: flex; gap: 10px; align-items: baseline; margin-bottom: 5px; }
+  .spot-ticker { font-weight: 800; color: var(--purple); }
+  .spot-co { font-size: 0.78rem; color: var(--muted); }
+
+  /* ── SECTOR GRID ── */
+  .sector-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .sector-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; }
+  .sector-card .sname { font-size: 0.76rem; color: var(--muted); margin-bottom: 4px; }
+  .sector-card .ssig  { font-size: 1.25rem; }
+  .sector-card .sreason { font-size: 0.68rem; color: var(--muted); margin-top: 4px; }
+
+  /* ── TABLES ── */
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.79rem; }
+  th { background: var(--surface); color: var(--muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 9px 11px; text-align: left; border-bottom: 2px solid var(--border); cursor: pointer; user-select: none; white-space: nowrap; }
+  th:hover { color: var(--text); }
+  th.asc::after  { content: ' ↑'; opacity: 1; color: var(--gold); }
+  th.desc::after { content: ' ↓'; opacity: 1; color: var(--gold); }
+  th:not(.asc):not(.desc)::after { content: ' ↕'; opacity: 0.3; font-size: 0.62rem; }
+  td { padding: 8px 11px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:hover td { background: var(--surface); }
+  .td-g { color: var(--green); font-weight: 600; }
+  .td-r { color: var(--red);   font-weight: 600; }
+  .td-y { color: var(--gold);  font-weight: 600; }
+
+  /* ── DISCLAIMER ── */
+  .disclaimer { margin: 36px 0 16px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--red); border-radius: 8px; padding: 14px 16px; font-size: 0.73rem; color: var(--muted); line-height: 1.7; }
+  .disclaimer strong { color: var(--red); }
+
+  @media (max-width: 640px) {
+    .cap-grid, .pred-grid { grid-template-columns: 1fr; }
+    .header h1 { font-size: 1.05rem; }
+    .nav-tab { padding: 6px 10px; font-size: 0.74rem; }
+    .section { padding: 16px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>🇮🇳 Market Briefing + India Intraday — <span class="accent">Mon, June 22, 2026</span></h1>
+      <div class="header-meta">Generated: Sun, June 21, 2026 (weekend) &nbsp;|&nbsp; Built off last sessions: India Fri Jun 19 · US Thu Jun 18 (Jun 19 = Juneteenth) &nbsp;|&nbsp; Intraday view: for Mon Jun 22</div>
+      <div class="market-tone">Risk-on tone into Monday: the US–Iran peace framework has crushed crude (~$76 WTI), a tailwind for oil-importer India — but an Accenture demand warning has IT under heavy pressure and a hawkish Fed under Warsh caps the upside.</div>
+    </div>
+    <button class="theme-btn" onclick="toggleTheme()">☀️ Light</button>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-chip">🎯 <b>15</b> Intraday Picks</div>
+    <div class="stat-chip">🏢 <b>5</b> Large Cap</div>
+    <div class="stat-chip">📊 <b>5</b> Mid Cap</div>
+    <div class="stat-chip">🌱 <b>5</b> Small Cap</div>
+    <div class="stat-chip">🔄 <b>3</b> Reversals</div>
+    <div class="stat-chip">📉 <b>3</b> Fall Calls</div>
+    <div class="stat-chip">🌐 <b>3</b> Geo Themes</div>
+  </div>
+</div>
+
+<!-- ═══ TABS ═══ -->
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="showTab('intraday')">🎯 India Intraday</button>
+  <button class="nav-tab" onclick="showTab('dealflow')">📝 Deal Flow</button>
+  <button class="nav-tab" onclick="showTab('spotlight')">🔭 Small Cap</button>
+  <button class="nav-tab" onclick="showTab('global')">🌍 Global Picks</button>
+  <button class="nav-tab" onclick="showTab('geopolitical')">🌐 Geopolitical</button>
+  <button class="nav-tab" onclick="showTab('usnews')">🇺🇸 US News</button>
+  <button class="nav-tab" onclick="showTab('indianews')">🇮🇳 India News</button>
+  <button class="nav-tab" onclick="showTab('fundamentals')">📋 Fundamentals</button>
+</div>
+
+<!-- ═══ TAB: INDIA INTRADAY ═══ -->
+<div id="tab-intraday" class="section active">
+  <div class="section-title"><span class="emoji">🎯</span> India Intraday Predictions — Cap-Tier View</div>
+  <div class="cap-grid">
+
+    <div>
+      <div class="cap-col-title">🏢 Large Cap &gt; ₹20,000 Cr</div>
+<div class="pick-card surge">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">BHARATFORG</div><div class="cname">Bharat Forge Ltd</div></div>
+    <div class="price-block"><div class="price">₹2,041.4</div><div class="chg pos">Mkt cap ₹97,597 Cr · large cap</div></div>
+  </div>
+  <div class="badge-row"><span class="badge b-surge">🚀 >10% potential</span><span class="badge b-cap">Large Cap</span><span class="badge b-catalyst">Order Win</span></div>
+  <div class="clabel">Catalyst</div><div class="ctext">On 19 Jun the company filed a ₹425 crore Ministry of Defence contract to supply Gas Turbine Generators to the Indian Navy. This stacks on a busy defence run by subsidiary KSSL — the MArG 155mm mounted artillery series and Simha 4x4 unveiled at Eurosatory, plus an AM General tie-up for a US Army program.</div>
+  <div class="clabel">Why Monday</div><div class="ctext">A confirmed exchange-filed defence order plus heavy Eurosatory news-flow keeps the Kalyani defence story in focus. The stock is sitting right under its 52-week high (₹2,059), so the order is a potential breakout trigger.</div>
+  <div class="clabel">Source</div><div class="ctext"><a href="https://www.screener.in/company/BHARATFORG/consolidated/" target="_blank" rel="noopener">Screener / BSE filing 19 Jun</a></div>
+  <div class="clabel">Entry note</div><div class="ctext">Watch for a move above ₹2,059 (52-wk high) on volume; a clean break opens room higher. Below ₹2,000, let it settle first.</div>
+  <div class="clabel">Risk</div><div class="ctext">Valuation is rich (P/B ~10x); a market-wide risk-off or profit-booking after the recent run could cap gains.</div>
+  <div class="iss-row"><span class="iss-lbl">ISS</span><span class="iss-comp">Catalyst 8</span><span class="iss-comp">Social 2</span><span class="iss-comp">Momentum 2</span><span class="iss-comp">Liquidity 3</span><span class="iss-total">= 15/20</span></div>
+</div>
+<div class="pick-card surge">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">HAL</div><div class="cname">Hindustan Aeronautics</div></div>
+    <div class="price-block"><div class="price">₹4,406</div><div class="chg pos">Mkt cap ₹2,95,030 Cr · P/E 32.5</div></div>
+  </div>
+  <div class="badge-row"><span class="badge b-surge">🚀 >10% potential</span><span class="badge b-cap">Large Cap</span><span class="badge b-catalyst">Order Win</span><span class="badge b-reversal">🔄 Reversal</span></div>
+  <div class="clabel">Catalyst</div><div class="ctext">A fresh ₹2,312 crore MoD contract for 8 Dornier-228 aircraft, on top of a ₹2,901 crore order for 6 ALH Mk-III maritime helicopters. The board also meets on 29 Jun to decide the FY26 final dividend.</div>
+  <div class="clabel">Why Monday</div><div class="ctext">HAL is down ~15% over the last year (Tejas-crash and delivery-delay overhang) even as FY26 net profit rose ~9% to ₹9,116 Cr. Large confirmed orders plus a near-term dividend trigger make this a classic catalyst-against-downtrend reversal setup.</div>
+  <div class="clabel">Source</div><div class="ctext"><a href="https://www.tickertape.in/stocks/hindustan-aeronautics-HIAE" target="_blank" rel="noopener">Tickertape / BSE filings</a></div>
+  <div class="clabel">Entry note</div><div class="ctext">Watch ₹4,435 (Friday high) as the first hurdle; sustaining above it targets the ₹4,600 zone. Support near ₹4,385.</div>
+  <div class="clabel">Risk</div><div class="ctext">Defence-output narrative is cooling now that the Iran war is winding down; any MoD penalty headline on Tejas delays could weigh.</div>
+  <div class="iss-row"><span class="iss-lbl">ISS</span><span class="iss-comp">Catalyst 10</span><span class="iss-comp">Social 2</span><span class="iss-comp">Momentum 3</span><span class="iss-comp">Liquidity 3</span><span class="iss-total">= 18/20</span></div>
+</div>
+<div class="pick-card gain">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">BAJAJ-AUTO</div><div class="cname">Bajaj Auto Ltd</div></div>
+    <div class="price-block"><div class="price">Verify before trade</div><div class="chg pos">Buyback record date 24 Jun</div></div>
+  </div>
+  <div class="badge-row"><span class="badge b-gain">📈 >5% potential</span><span class="badge b-cap">Large Cap</span><span class="badge b-catalyst">Buyback</span></div>
+  <div class="clabel">Catalyst</div><div class="ctext">The board approved a ₹5,632.8 crore share buyback and set the record date as 24 June 2026 — a sizeable capital-return event.</div>
+  <div class="clabel">Why Monday</div><div class="ctext">Buyback record dates typically draw buying interest in the run-up as traders position for the entitlement. With the record date on Wed 24 Jun, Monday and Tuesday are the positioning window.</div>
+  <div class="clabel">Source</div><div class="ctext"><a href="https://trendlyne.com/markets-today/" target="_blank" rel="noopener">Trendlyne markets desk</a></div>
+  <div class="clabel">Entry note</div><div class="ctext">Momentum/event play into the 24 Jun record date; watch how the stock opens relative to Friday close and the buyback price.</div>
+  <div class="clabel">Risk</div><div class="ctext">Buyback acceptance ratios can disappoint; auto demand commentary or a broad risk-off can offset the event bid.</div>
+  <div class="iss-row"><span class="iss-lbl">ISS</span><span class="iss-comp">Catalyst 7</span><span class="iss-comp">Social 1</span><span class="iss-comp">Momentum 2</span><span class="iss-comp">Liquidity 3</span><span class="iss-total">= 13/20</span></div>
+</div>
+<div class="pick-card gain">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">RELIANCE</div><div class="cname">Reliance Industries</div></div>
+    <div class="price-block"><div class="price">Verify before trade</div><div class="chg pos">Jio IPO value-unlock</div></div>
+  </div>
+  <div class="badge-row"><span class="badge b-gain">📈 >5% potential</span><span class="badge b-cap">Large Cap</span><span class="badge b-catalyst">Corp Action</span></div>
+  <div class="clabel">Catalyst</div><div class="ctext">Reliance arm Jio Platforms approved its IPO draft via a fresh issue of ~27 crore shares — a long-awaited value-unlocking step for the group’s digital business.</div>
+  <div class="clabel">Why Monday</div><div class="ctext">A Jio Platforms listing is one of the biggest value-unlock catalysts in the index. Combined with softer crude (a positive for the O2C/refining complex on the demand side), it keeps Reliance in focus on Monday.</div>
+  <div class="clabel">Source</div><div class="ctext"><a href="https://trendlyne.com/markets-today/" target="_blank" rel="noopener">Trendlyne markets desk</a></div>
+  <div class="clabel">Entry note</div><div class="ctext">Index heavyweight — moves are usually measured. Watch the gap reaction at open to the Jio IPO headlines.</div>
+  <div class="clabel">Risk</div><div class="ctext">IPO timelines can slip; refining-margin swings from the oil reset cut both ways for the energy segment.</div>
+  <div class="iss-row"><span class="iss-lbl">ISS</span><span class="iss-comp">Catalyst 6</span><span class="iss-comp">Social 2</span><span class="iss-comp">Momentum 1</span><span class="iss-comp">Liquidity 3</span><span class="iss-total">= 12/20</span></div>
+</div>
+<div class="pick-card fall">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">INFY</div><div class="cname">Infosys Ltd</div></div>
+    <div class="price-block"><div class="price">Fell 6.48% Fri</div><div class="chg neg">IT demand warning</div></div>
+  </div>
+  <div class="badge-row"><span class="badge b-fall">📉 Likely to fall</span><span class="badge b-cap">Large Cap</span><span class="badge b-catalyst">Sector Hit</span></div>
+  <div class="clabel">Catalyst</div><div class="ctext">Accenture’s latest results carried a revenue-growth guidance cut, reigniting fears about IT services demand. Infosys was the worst Sensex loser on Friday, down 6.48%, with TCS, HCL Tech and Tech Mahindra also sliding.</div>
+  <div class="clabel">Why Monday</div><div class="ctext">The Accenture read-through is a sector-wide negative that tends to keep pressure on Indian IT majors for several sessions. Friday’s sharp fall may see follow-through selling before any stabilisation.</div>
+  <div class="clabel">Source</div><div class="ctext"><a href="https://tradingeconomics.com/india/stock-market" target="_blank" rel="noopener">Trading Economics India</a></div>
+  <div class="clabel">Entry note</div><div class="ctext">Avoid bottom-fishing on day one; let the IT pack find a base. Any bounce into resistance is more likely to be sold.</div>
+  <div class="clabel">Risk</div><div class="ctext">IT names are oversold short-term — a relief bounce or reassuring management commentary could squeeze shorts.</div>
+  <div class="iss-row"><span class="iss-lbl">ISS</span><span class="iss-comp">Catalyst 0</span><span class="iss-comp">Social 0</span><span class="iss-comp">Momentum 0</span><span class="iss-comp">Liquidity 0</span><span class="iss-total">Negative catalyst</span></div>
+</div>
+    </div>
+
+    <div>
+      <div class="cap-col-title">📊 Mid Cap ₹5,000–20,000 Cr</div>
+<div class="pick-card surge">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">KNRCON</div><div class="cname">KNR Constructions</div></div>
+    <div class="price-block"><div class="price">Verify before trade</div><div class="chg pos">₹2,163 Cr order</div></div>
+  </div>
+  <div class="badge-row"><span class="badge b-surge">🚀 >10% potential</span><span class="badge b-cap">Mid Cap</span><span class="badge b-catalyst">Order Win</span></div>
+  <div class="clabel">Catalyst</div><div class="ctext">Secured a ₹2,163 crore contract to build a four-lane elevated corridor along the East Coast Road (ECR). A large order relative to the company’s size, adding strong revenue visibility.</div>
+  <div class="clabel">Why Monday</div><div class="ctext">A multi-thousand-crore single order is a meaningful book addition for a mid-cap road EPC name and typically draws a positive open.</div>
+  <div class="clabel">Source</div><div class="ctext"><a href="https://www.newsonprojects.com/country?country=3&industry=306" target="_blank" rel="noopener">News on Projects</a></div>
+  <div class="clabel">Entry note</div><div class="ctext">Watch the opening reaction; large-order pops often see an early spike then consolidation — better entries can come on a pullback.</div>
+  <div class="clabel">Risk</div><div class="ctext">EPC execution and working-capital concerns; order-book bunching can mean lumpy delivery.</div>
+  <div class="iss-row"><span class="iss-lbl">ISS</span><span class="iss-comp">Catalyst 10</span><span class="iss-comp">Social 1</span><span class="iss-comp">Momentum 2</span><span class="iss-comp">Liquidity 2</span><span class="iss-total">= 15/20</span></div>
+</div>
+<div class="pick-card gain">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">MAHLIFE</div><div class="cname">Mahindra Lifespace Developers</div></div>
+    <div class="price-block"><div class="price">Verify before trade</div><div class="chg pos">₹5,600 Cr GDV add</div></div>
+  </div>
+  <div class="badge-row"><span class="badge b-gain">📈 >5% potential</span><span class="badge b-cap">Mid Cap</span><span class="badge b-catalyst">Project Add</span></div>
+  <div class="clabel">Catalyst</div><div class="ctext">Acquired a ~15-acre land parcel in Kandivali East (Mumbai) with an estimated gross development value of ~₹5,600 crore — a sizeable addition to the development pipeline.</div>
+  <div class="clabel">Why Monday</div><div class="ctext">A large GDV addition in a prime Mumbai micro-market expands the medium-term revenue runway and tends to be received positively by the Street.</div>
+  <div class="clabel">Source</div><div class="ctext"><a href="https://www.equitybulls.com/category.php?id=372039" target="_blank" rel="noopener">EquityBulls filings wire</a></div>
+  <div class="clabel">Entry note</div><div class="ctext">Real-estate names react to GDV headlines; watch the open and any brokerage notes quantifying the project NPV.</div>
+  <div class="clabel">Risk</div><div class="ctext">GDV is a top-line potential, not booked revenue; approvals and launch timing carry risk.</div>
+  <div class="iss-row"><span class="iss-lbl">ISS</span><span class="iss-comp">Catalyst 6</span><span class="iss-comp">Social 1</span><span class="iss-comp">Momentum 2</span><span class="iss-comp">Liquidity 2</span><span class="iss-total">= 11/20</span></div>
+</div>
+<div class="pick-card gain">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">MTAR</div><div class="cname">MTAR Technologies</div></div>
+    <div class="price-block"><div class="price">Up ~3.1% Fri</div><div class="chg pos">Defence momentum</div></div>
+  </div>
+  <div class="badge-row"><span class="badge b-gain">📈 >5% potential</span><span class="badge b-cap">Mid Cap</span><span class="badge b-catalyst">Momentum</span></div>
+  <div class="clabel">Catalyst</div><div class="ctext">Rose ~3.1% on Friday and ~7% on a recent defence-output day, riding the broader precision-engineering/defence theme as India’s FY26 defence output crossed ₹1.78 lakh crore (+15.6% YoY).</div>
+  <div class="clabel">Why Monday</div><div class="ctext">A momentum name within a hot sector rather than a single-order story. Strength tends to persist while defence sentiment runs.</div>
+  <div class="clabel">Source</div><div class="ctext"><a href="https://groww.in/stocks/hindustan-aeronautics-ltd" target="_blank" rel="noopener">Groww / Trading Economics</a></div>
+  <div class="clabel">Entry note</div><div class="ctext">Lower-conviction, momentum-only — monitor entry. Prefer dips toward support over chasing a gap-up.</div>
+  <div class="clabel">Risk</div><div class="ctext">No fresh confirmed order today; momentum can reverse quickly if the defence theme cools post-Iran-deal.</div>
+  <div class="iss-row"><span class="iss-lbl">ISS</span><span class="iss-comp">Catalyst 4</span><span class="iss-comp">Social 2</span><span class="iss-comp">Momentum 3</span><span class="iss-comp">Liquidity 2</span><span class="iss-total">= 11/20</span></div>
+</div>
+<div class="pick-card fall">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">BIRLASOFT</div><div class="cname">Birlasoft Ltd</div></div>
+    <div class="price-block"><div class="price">IT read-through</div><div class="chg neg">Accenture warning</div></div>
+  </div>
+  <div class="badge-row"><span class="badge b-fall">📉 Likely to fall</span><span class="badge b-cap">Mid Cap</span><span class="badge b-catalyst">Sector Hit</span></div>
+  <div class="clabel">Catalyst</div><div class="ctext">Mid-tier IT services tend to take the Accenture demand-warning read-through hardest, as discretionary-spend cuts hit them disproportionately. The whole IT pack fell on Friday.</div>
+  <div class="clabel">Why Monday</div><div class="ctext">Sector-wide negative sentiment from the Accenture guidance cut is likely to keep mid-cap IT under pressure alongside the large-caps.</div>
+  <div class="clabel">Source</div><div class="ctext"><a href="https://tradingeconomics.com/india/stock-market" target="_blank" rel="noopener">Trading Economics India</a></div>
+  <div class="clabel">Entry note</div><div class="ctext">Avoid catching the falling knife; any intraday bounce into resistance is the higher-probability fade.</div>
+  <div class="clabel">Risk</div><div class="ctext">Mid-cap IT can be volatile; an oversold bounce or a stock-specific deal win could buck the sector trend.</div>
+  <div class="iss-row"><span class="iss-lbl">ISS</span><span class="iss-comp">Catalyst 0</span><span class="iss-comp">Social 0</span><span class="iss-comp">Momentum 0</span><span class="iss-comp">Liquidity 0</span><span class="iss-total">Negative catalyst</span></div>
+</div>
+<div class="pick-card fall">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">RAJESHEXPO</div><div class="cname">Rajesh Exports</div></div>
+    <div class="price-block"><div class="price">Cap: verify tier</div><div class="chg neg">SEBI flag</div></div>
+  </div>
+  <div class="badge-row"><span class="badge b-fall">📉 Likely to fall</span><span class="badge b-cap">Mid Cap</span><span class="badge b-catalyst">Regulatory</span><span class="badge b-unconf">Verify</span></div>
+  <div class="clabel">Catalyst</div><div class="ctext">SEBI reportedly flagged a ₹15.15 lakh crore revenue mis-statement at the company — a serious regulatory red flag.</div>
+  <div class="clabel">Why Monday</div><div class="ctext">Regulatory mis-statement headlines typically trigger immediate, sharp selling and elevated volatility regardless of prior trend.</div>
+  <div class="clabel">Source</div><div class="ctext"><a href="https://www.businesstoday.in/markets" target="_blank" rel="noopener">Business Today markets</a></div>
+  <div class="clabel">Entry note</div><div class="ctext">High-risk fall candidate; expect a gap-down and wide swings. Confirm the latest exchange clarification before acting.</div>
+  <div class="clabel">Risk</div><div class="ctext">Company rebuttal or clarification could spark a sharp short-covering bounce; headline is still developing — verify.</div>
+  <div class="iss-row"><span class="iss-lbl">ISS</span><span class="iss-comp">Catalyst 0</span><span class="iss-comp">Social 0</span><span class="iss-comp">Momentum 0</span><span class="iss-comp">Liquidity 0</span><span class="iss-total">Negative catalyst</span></div>
+</div>
+    </div>
+
+    <div>
+      <div class="cap-col-title">🌱 Small Cap &lt; ₹5,000 Cr</div>
+<div class="pick-card gain">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">GOODLUCK</div><div class="cname">Goodluck India Ltd</div></div>
+    <div class="price-block"><div class="price">Listed parent</div><div class="chg pos">₹255 Cr defence order</div></div>
+  </div>
+  <div class="badge-row"><span class="badge b-gain">📈 >5% potential</span><span class="badge b-cap">Small Cap</span><span class="badge b-catalyst">Order Win</span><span class="badge b-reversal">🔄 Reversal</span></div>
+  <div class="clabel">Catalyst</div><div class="ctext">Subsidiary Goodluck Defence & Aerospace won a ₹255 crore domestic order for 155mm artillery shells, to be executed in ~10 months. Note: the <b>tradeable listed entity is the parent, Goodluck India (NSE: GOODLUCK)</b> — the defence arm is unlisted.</div>
+  <div class="clabel">Why Monday</div><div class="ctext">A ₹255 Cr order is large relative to Goodluck India’s size and validates the group’s defence pivot (Adani Defence has shown interest in a third of the shell output). A fresh catalyst against a consolidating chart is a reversal setup.</div>
+  <div class="clabel">Source</div><div class="ctext"><a href="https://www.screener.in/company/GOODLUCK/consolidated/" target="_blank" rel="noopener">Screener (Goodluck India)</a></div>
+  <div class="clabel">Entry note</div><div class="ctext">Trade the listed parent GOODLUCK, not the unlisted defence subsidiary. Watch the opening reaction to the order filing.</div>
+  <div class="clabel">Risk</div><div class="ctext">Order flows to an unlisted arm — earnings accretion to the parent is indirect; small-cap liquidity can be thin.</div>
+  <div class="iss-row"><span class="iss-lbl">ISS</span><span class="iss-comp">Catalyst 8</span><span class="iss-comp">Social 2</span><span class="iss-comp">Momentum 2</span><span class="iss-comp">Liquidity 2</span><span class="iss-total">= 14/20</span></div>
+</div>
+<div class="pick-card surge">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">PARAS</div><div class="cname">Paras Defence & Space Tech</div></div>
+    <div class="price-block"><div class="price">~₹900 (recent)</div><div class="chg pos">Up ~6% Fri, +30% YTD</div></div>
+  </div>
+  <div class="badge-row"><span class="badge b-surge">🚀 >10% potential</span><span class="badge b-cap">Small Cap</span><span class="badge b-catalyst">Momentum + Order</span></div>
+  <div class="clabel">Catalyst</div><div class="ctext">On a tear: +6% Friday and ~+13% on a recent defence-output day, up 30%+ YTD. Backed by a ₹52.82 Cr BEL electro-optics order (2 Jun filing), a strong Q4 (revenue ₹171 Cr vs ₹108 Cr), a ₹1 dividend and a 10-year air-to-air refuelling pact with US-based Northstar.</div>
+  <div class="clabel">Why Monday</div><div class="ctext">A multi-catalyst momentum leader in the hottest small/mid defence space. While the theme runs, leaders like Paras tend to keep attracting flows.</div>
+  <div class="clabel">Source</div><div class="ctext"><a href="https://www.businesstoday.in/markets/stocks/story/defence-stock-jumps-over-30-in-2026-so-far-up-9-today-order-win-from-bel-q4-results-and-more-534887-2026-06-04" target="_blank" rel="noopener">Business Today</a></div>
+  <div class="clabel">Entry note</div><div class="ctext">Extended — prefer buying strength on a breakout rather than chasing a gap; keep a tight stop given the run.</div>
+  <div class="clabel">Risk</div><div class="ctext">Stretched after a 30% YTD run; high beta means sharp pullbacks if defence sentiment cools post-Iran deal.</div>
+  <div class="iss-row"><span class="iss-lbl">ISS</span><span class="iss-comp">Catalyst 6</span><span class="iss-comp">Social 3</span><span class="iss-comp">Momentum 4</span><span class="iss-comp">Liquidity 2</span><span class="iss-total">= 15/20</span></div>
+</div>
+<div class="pick-card gain">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">ARFIN</div><div class="cname">Arfin India Ltd</div></div>
+    <div class="price-block"><div class="price">Verify before trade</div><div class="chg pos">₹300 Cr order</div></div>
+  </div>
+  <div class="badge-row"><span class="badge b-gain">📈 >5% potential</span><span class="badge b-cap">Small Cap</span><span class="badge b-catalyst">Order Win</span><span class="badge b-unconf">Low liquidity</span></div>
+  <div class="clabel">Catalyst</div><div class="ctext">Received an order worth ₹300 crore — very large relative to this small-cap aluminium products company.</div>
+  <div class="clabel">Why Monday</div><div class="ctext">An order this size versus the company’s scale is a strong percentage catalyst and can drive an upper-circuit move in a thinly traded name.</div>
+  <div class="clabel">Source</div><div class="ctext"><a href="https://www.equitybulls.com/category.php?id=372043" target="_blank" rel="noopener">EquityBulls filings wire</a></div>
+  <div class="clabel">Entry note</div><div class="ctext">Low float — entries can trap buyers at upper circuit and exits are thin. Size positions accordingly.</div>
+  <div class="clabel">Risk</div><div class="ctext">Illiquidity is the main risk; verify order details and counterparty on the BSE filing before trading.</div>
+  <div class="iss-row"><span class="iss-lbl">ISS</span><span class="iss-comp">Catalyst 8</span><span class="iss-comp">Social 1</span><span class="iss-comp">Momentum 2</span><span class="iss-comp">Liquidity 1</span><span class="iss-total">= 12/20</span></div>
+</div>
+<div class="pick-card gain">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">MICEL</div><div class="cname">MIC Electronics Ltd</div></div>
+    <div class="price-block"><div class="price">Verify before trade</div><div class="chg pos">₹114 Cr order</div></div>
+  </div>
+  <div class="badge-row"><span class="badge b-gain">📈 >5% potential</span><span class="badge b-cap">Small Cap</span><span class="badge b-catalyst">Order Win</span></div>
+  <div class="clabel">Catalyst</div><div class="ctext">Secured a ₹114.10 crore mandate from Nava Raipur Atal Nagar Vikas Pradhikaran for design, development, commissioning and operationalisation of a facility centre.</div>
+  <div class="clabel">Why Monday</div><div class="ctext">A ₹100 Cr+ order is meaningful for a small-cap electronics/display name and typically draws momentum traders on the filing.</div>
+  <div class="clabel">Source</div><div class="ctext"><a href="https://www.newsonprojects.com/country?country=3&industry=306" target="_blank" rel="noopener">News on Projects</a></div>
+  <div class="clabel">Entry note</div><div class="ctext">Watch the opening pop and whether it holds; small-cap order pops often fade intraday after the initial spike.</div>
+  <div class="clabel">Risk</div><div class="ctext">Execution track record and working capital are the watch-items; thin liquidity amplifies moves both ways.</div>
+  <div class="iss-row"><span class="iss-lbl">ISS</span><span class="iss-comp">Catalyst 8</span><span class="iss-comp">Social 2</span><span class="iss-comp">Momentum 2</span><span class="iss-comp">Liquidity 1</span><span class="iss-total">= 13/20</span></div>
+</div>
+<div class="pick-card gain">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">3IINFOTECH</div><div class="cname">3i Infotech Ltd</div></div>
+    <div class="price-block"><div class="price">Verify before trade</div><div class="chg pos">₹33.6 Cr UAE order</div></div>
+  </div>
+  <div class="badge-row"><span class="badge b-gain">📈 >5% potential</span><span class="badge b-cap">Small Cap</span><span class="badge b-catalyst">Order Win</span><span class="badge b-reversal">🔄 Reversal</span></div>
+  <div class="clabel">Catalyst</div><div class="ctext">On 19 Jun the company received a ~AED 13.08 mn (₹33.6 crore) one-year purchase order from a UAE-based technology firm for cybersecurity, cloud and infra professional services (extendable).</div>
+  <div class="clabel">Why Monday</div><div class="ctext">A modest but confirmed international order for a long-running turnaround/restructuring story; incremental contract wins help the recovery narrative.</div>
+  <div class="clabel">Source</div><div class="ctext"><a href="https://www.equitybulls.com/category.php?id=372043" target="_blank" rel="noopener">EquityBulls filings wire</a></div>
+  <div class="clabel">Entry note</div><div class="ctext">Smaller order — lower conviction. Watch volume confirmation before committing.</div>
+  <div class="clabel">Risk</div><div class="ctext">Order size is small; the stock’s turnaround is still in progress and can be volatile.</div>
+  <div class="iss-row"><span class="iss-lbl">ISS</span><span class="iss-comp">Catalyst 6</span><span class="iss-comp">Social 1</span><span class="iss-comp">Momentum 2</span><span class="iss-comp">Liquidity 2</span><span class="iss-total">= 11/20</span></div>
+</div>
+    </div>
+
+  </div>
+
+  <div class="section-title"><span class="emoji">⚡</span> Sector Pulse Today</div>
+  <div class="sector-grid">
+<div class="sector-card"><div class="sname">Defence</div><div class="ssig">🟢</div><div class="sreason">HAL, Bharat Forge, Goodluck, Paras order flow; FY26 output ₹1.78 L Cr</div></div>
+<div class="sector-card"><div class="sname">IT</div><div class="ssig">🔴</div><div class="sreason">Accenture guidance cut; Infosys −6.5% Fri, TCS/HCL/TechM weak</div></div>
+<div class="sector-card"><div class="sname">Power & Renewables</div><div class="ssig">🟢</div><div class="sreason">NTPC, Power Grid gained Fri; BHEL bags SAIL CPP LoA</div></div>
+<div class="sector-card"><div class="sname">Oil & OMC</div><div class="ssig">🟢</div><div class="sreason">Crude collapse on Iran deal aids importers/marketers</div></div>
+<div class="sector-card"><div class="sname">Real Estate</div><div class="ssig">🟢</div><div class="sreason">Mahindra Lifespaces ₹5,600 Cr GDV add; infra orders</div></div>
+<div class="sector-card"><div class="sname">Railways</div><div class="ssig">🟢</div><div class="sreason">Texmaco, BCPL, infra order wins continue</div></div>
+<div class="sector-card"><div class="sname">Banking & NBFC</div><div class="ssig">🔴</div><div class="sreason">HDFC Bank −2.3% Fri; hawkish-Fed yield backdrop</div></div>
+<div class="sector-card"><div class="sname">Chemicals</div><div class="ssig">⚪</div><div class="sreason">Himadri battery-materials stake up; lower crude helps inputs</div></div>
+<div class="sector-card"><div class="sname">Pharma</div><div class="ssig">⚪</div><div class="sreason">No major same-day catalyst; defensive bid possible</div></div>
+  </div>
+</div>
+
+<!-- ═══ TAB: DEAL FLOW ═══ -->
+<div id="tab-dealflow" class="section">
+  <div class="section-title"><span class="emoji">📝</span> All India Deals & Catalysts Today</div>
+  <div class="tbl-wrap">
+    <table id="dealTable">
+      <thead><tr>
+        <th onclick="sortTable('dealTable',0)">Time</th>
+        <th onclick="sortTable('dealTable',1)">Company</th>
+        <th onclick="sortTable('dealTable',2)">Ticker</th>
+        <th onclick="sortTable('dealTable',3)">Catalyst Type</th>
+        <th onclick="sortTable('dealTable',4)">Size (₹ Cr)</th>
+        <th onclick="sortTable('dealTable',5)">Counterparty</th>
+        <th onclick="sortTable('dealTable',6)">Confirmed?</th>
+        <th onclick="sortTable('dealTable',7)">ISS</th>
+        <th onclick="sortTable('dealTable',8)">Cap Tier</th>
+        <th onclick="sortTable('dealTable',9)">Source</th>
+      </tr></thead>
+      <tbody>
+<tr><td>19 Jun</td><td>HAL</td><td>HAL</td><td>Order Win</td><td>2,312</td><td>Ministry of Defence</td><td>✅ Filing</td><td>18</td><td>Large</td><td><a href="https://www.newsonprojects.com/country?country=3&industry=306" target="_blank" rel="noopener">link</a></td></tr>
+<tr><td>Recent</td><td>HAL</td><td>HAL</td><td>Order Win</td><td>2,901</td><td>Indian Navy (ALH Mk-III)</td><td>✅ Filing</td><td>18</td><td>Large</td><td><a href="https://www.newsonprojects.com/country?country=3&industry=306" target="_blank" rel="noopener">link</a></td></tr>
+<tr><td>Recent</td><td>KNR Constructions</td><td>KNRCON</td><td>Order Win</td><td>2,163</td><td>ECR (road authority)</td><td>✅ Media</td><td>15</td><td>Mid</td><td><a href="https://www.newsonprojects.com/country?country=3&industry=306" target="_blank" rel="noopener">link</a></td></tr>
+<tr><td>Recent</td><td>Mahindra Lifespaces</td><td>MAHLIFE</td><td>Land/Project</td><td>~5,600 GDV</td><td>Kandivali East parcel</td><td>✅ Filing</td><td>11</td><td>Mid</td><td><a href="https://www.equitybulls.com/category.php?id=372039" target="_blank" rel="noopener">link</a></td></tr>
+<tr><td>Approved</td><td>Bajaj Auto</td><td>BAJAJ-AUTO</td><td>Buyback</td><td>5,632.8</td><td>— (record date 24 Jun)</td><td>✅ Board</td><td>13</td><td>Large</td><td><a href="https://trendlyne.com/markets-today/" target="_blank" rel="noopener">link</a></td></tr>
+<tr><td>19 Jun</td><td>Bharat Forge</td><td>BHARATFORG</td><td>Order Win</td><td>425</td><td>Indian Navy (GTGs)</td><td>✅ Filing</td><td>15</td><td>Large</td><td><a href="https://www.screener.in/company/BHARATFORG/consolidated/" target="_blank" rel="noopener">link</a></td></tr>
+<tr><td>Recent</td><td>Goodluck (Defence arm)</td><td>GOODLUCK</td><td>Order Win</td><td>255</td><td>Domestic (155mm shells)</td><td>✅ Filing</td><td>14</td><td>Small</td><td><a href="https://www.screener.in/company/GOODLUCK/consolidated/" target="_blank" rel="noopener">link</a></td></tr>
+<tr><td>Recent</td><td>Arfin India</td><td>ARFIN</td><td>Order Win</td><td>300</td><td>Undisclosed</td><td>✅ Filing</td><td>12</td><td>Small</td><td><a href="https://www.equitybulls.com/category.php?id=372039" target="_blank" rel="noopener">link</a></td></tr>
+<tr><td>Recent</td><td>MIC Electronics</td><td>MICEL</td><td>Order Win</td><td>114.1</td><td>Nava Raipur (NRANVP)</td><td>✅ Filing</td><td>13</td><td>Small</td><td><a href="https://www.newsonprojects.com/country?country=3&industry=306" target="_blank" rel="noopener">link</a></td></tr>
+<tr><td>Recent</td><td>Bharat Forge (KSSL)</td><td>BHARATFORG</td><td>Partnership</td><td>—</td><td>AM General (US Army prog.)</td><td>✅ Filing</td><td>—</td><td>Large</td><td><a href="https://www.screener.in/company/BHARATFORG/consolidated/" target="_blank" rel="noopener">link</a></td></tr>
+<tr><td>19 Jun</td><td>3i Infotech</td><td>3IINFOTECH</td><td>Order Win</td><td>33.6</td><td>UAE tech firm</td><td>✅ Filing</td><td>11</td><td>Small</td><td><a href="https://www.equitybulls.com/category.php?id=372039" target="_blank" rel="noopener">link</a></td></tr>
+<tr><td>Recent</td><td>Texmaco Rail</td><td>TEXMACO</td><td>Order Win</td><td>11.65</td><td>Odisha Power Transmission</td><td>✅ Filing</td><td>10</td><td>Small</td><td><a href="https://www.equitybulls.com/category.php?id=372039" target="_blank" rel="noopener">link</a></td></tr>
+<tr><td>Recent</td><td>Himadri Speciality</td><td>HIMADRI</td><td>Stake/Invest</td><td>—</td><td>Intl Battery Co (→20.47%)</td><td>✅ Filing</td><td>9</td><td>Mid</td><td><a href="https://www.equitybulls.com/category.php?id=372039" target="_blank" rel="noopener">link</a></td></tr>
+<tr><td>Recent</td><td>Divgi TorqTransfer</td><td>DIVGITTS</td><td>Order Win</td><td>—</td><td>Indian OEM (AWD system)</td><td>✅ Filing</td><td>—</td><td>Small</td><td><a href="https://www.equitybulls.com/category.php?id=372039" target="_blank" rel="noopener">link</a></td></tr>
+<tr><td>Recent</td><td>BHEL</td><td>BHEL</td><td>LoA</td><td>—</td><td>SAIL (Captive Power Plant)</td><td>✅ Filing</td><td>—</td><td>Large</td><td><a href="https://www.newsonprojects.com/country?country=3&industry=306" target="_blank" rel="noopener">link</a></td></tr>
+<tr><td>Approved</td><td>Jio Platforms (RIL)</td><td>RELIANCE</td><td>IPO Draft</td><td>—</td><td>27 cr fresh shares</td><td>✅ Board</td><td>12</td><td>Large</td><td><a href="https://trendlyne.com/markets-today/" target="_blank" rel="noopener">link</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ TAB: SMALL CAP SPOTLIGHT ═══ -->
+<div id="tab-spotlight" class="section">
+  <div class="section-title"><span class="emoji">🔭</span> Small Cap Spotlight — Recent Investment Activity (Last 7 Days)</div>
+<div class="spot-card">
+  <div class="spot-head"><span class="spot-ticker">GOODLUCK</span><span class="spot-co">Goodluck India</span></div>
+  <div class="ctext"><b>Catalyst / investor:</b> Defence subsidiary order (155mm shells) &nbsp;|&nbsp; <b>Amount:</b> ₹255 Cr</div>
+  <div class="ctext" style="margin-top:4px;"><b>Why it might move:</b> Large order vs company size; Adani Defence keen on a third of output. Trade the listed parent.</div>
+  <div class="ctext" style="margin-top:4px;"><b>Source:</b> <a href="https://www.screener.in/company/GOODLUCK/consolidated/" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;">filing</a></div>
+</div>
+<div class="spot-card">
+  <div class="spot-head"><span class="spot-ticker">ARFIN</span><span class="spot-co">Arfin India</span></div>
+  <div class="ctext"><b>Catalyst / investor:</b> Fresh order &nbsp;|&nbsp; <b>Amount:</b> ₹300 Cr</div>
+  <div class="ctext" style="margin-top:4px;"><b>Why it might move:</b> Very large vs scale — potential upper-circuit move; thin liquidity.</div>
+  <div class="ctext" style="margin-top:4px;"><b>Source:</b> <a href="https://www.equitybulls.com/category.php?id=372039" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;">filing</a></div>
+</div>
+<div class="spot-card">
+  <div class="spot-head"><span class="spot-ticker">MICEL</span><span class="spot-co">MIC Electronics</span></div>
+  <div class="ctext"><b>Catalyst / investor:</b> Nava Raipur facility mandate &nbsp;|&nbsp; <b>Amount:</b> ₹114.1 Cr</div>
+  <div class="ctext" style="margin-top:4px;"><b>Why it might move:</b> ₹100 Cr+ order meaningful for a small-cap display/electronics name.</div>
+  <div class="ctext" style="margin-top:4px;"><b>Source:</b> <a href="https://www.newsonprojects.com/country?country=3&industry=306" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;">filing</a></div>
+</div>
+<div class="spot-card">
+  <div class="spot-head"><span class="spot-ticker">3IINFOTECH</span><span class="spot-co">3i Infotech</span></div>
+  <div class="ctext"><b>Catalyst / investor:</b> UAE tech-services order (1-yr) &nbsp;|&nbsp; <b>Amount:</b> ₹33.6 Cr</div>
+  <div class="ctext" style="margin-top:4px;"><b>Why it might move:</b> Incremental international win for an ongoing turnaround story.</div>
+  <div class="ctext" style="margin-top:4px;"><b>Source:</b> <a href="https://www.equitybulls.com/category.php?id=372039" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;">filing</a></div>
+</div>
+
+  <div class="section-title"><span class="emoji">🔔</span> Additional Small Cap Catalysts Today (Not In Top 5)</div>
+<div class="spot-card">
+  <div class="spot-head"><span class="spot-ticker">TEXMACO</span><span class="spot-co">Texmaco Rail & Engg</span></div>
+  <div class="ctext"><b>Catalyst / investor:</b> Odisha Power Transmission orders &nbsp;|&nbsp; <b>Amount:</b> ₹11.65 Cr</div>
+  <div class="ctext" style="margin-top:4px;"><b>Why it might move:</b> Steady railway/transmission order flow; small but additive.</div>
+  <div class="ctext" style="margin-top:4px;"><b>Source:</b> <a href="https://www.equitybulls.com/category.php?id=372039" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;">filing</a></div>
+</div>
+<div class="spot-card">
+  <div class="spot-head"><span class="spot-ticker">IFCI</span><span class="spot-co">IFCI Ltd</span></div>
+  <div class="ctext"><b>Catalyst / investor:</b> PSU re-rating momentum &nbsp;|&nbsp; <b>Amount:</b> —</div>
+  <div class="ctext" style="margin-top:4px;"><b>Why it might move:</b> Jumped ~5.7% Fri on PSU/financials momentum — no single-order catalyst; momentum only.</div>
+  <div class="ctext" style="margin-top:4px;"><b>Source:</b> <a href="https://tradingeconomics.com/india/stock-market" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;">filing</a></div>
+</div>
+<div class="spot-card">
+  <div class="spot-head"><span class="spot-ticker">HFCL</span><span class="spot-co">HFCL Ltd</span></div>
+  <div class="ctext"><b>Catalyst / investor:</b> Telecom/defence momentum &nbsp;|&nbsp; <b>Amount:</b> —</div>
+  <div class="ctext" style="margin-top:4px;"><b>Why it might move:</b> Rose ~5% Fri; watch for fresh order news to sustain the move.</div>
+  <div class="ctext" style="margin-top:4px;"><b>Source:</b> <a href="https://tradingeconomics.com/india/stock-market" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;">filing</a></div>
+</div>
+<div class="spot-card">
+  <div class="spot-head"><span class="spot-ticker">DIVGITTS</span><span class="spot-co">Divgi TorqTransfer</span></div>
+  <div class="ctext"><b>Catalyst / investor:</b> AWD system strategic order &nbsp;|&nbsp; <b>Amount:</b> —</div>
+  <div class="ctext" style="margin-top:4px;"><b>Why it might move:</b> Won an all-wheel-drive system order from an existing Indian OEM.</div>
+  <div class="ctext" style="margin-top:4px;"><b>Source:</b> <a href="https://www.equitybulls.com/category.php?id=372039" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;">filing</a></div>
+</div>
+</div>
+
+<!-- ═══ TAB: GLOBAL PICKS ═══ -->
+<div id="tab-global" class="section">
+  <div class="section-title"><span class="emoji">🌍</span> Global Predictions — US + India (Broad Market)</div>
+  <div class="pred-grid">
+
+    <div>
+      <div class="pred-col-title">📈 Likely to Rise Today</div>
+      <div>
+        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;">🇺🇸 US Stocks</div>
+<div class="global-card rise">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">INTC</div><div class="cname">Intel Corp</div></div>
+    <div class="price-block"><div class="price">+10.6% Thu</div><span class="score-pill pos">Score +7</span></div>
+  </div>
+  <div class="badge-row"><span class="badge b-geo">🌐 Geopolitical</span></div>
+  <div class="ctext">Surged Thursday after President Trump said Intel would produce chips for Apple in the US — a strong reshoring/industrial-policy catalyst. Pairs an order-flow story with the broader “made-in-America” chip push.</div>
+</div>
+<div class="global-card rise">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">NVDA</div><div class="cname">NVIDIA Corp</div></div>
+    <div class="price-block"><div class="price">—</div><span class="score-pill pos">Score +6</span></div>
+  </div>
+  
+  <div class="ctext">BofA reiterated Buy with a $350 target after the CFO framed the addressable market doubling across Vera Rubin/Feynman generations. AI-capex momentum remains the market’s growth engine despite the early-June chip wobble.</div>
+</div>
+<div class="global-card rise">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">DAL</div><div class="cname">Delta Air Lines</div></div>
+    <div class="price-block"><div class="price">—</div><span class="score-pill pos">Score +4</span></div>
+  </div>
+  <div class="badge-row"><span class="badge b-geo">🌐 Geopolitical</span></div>
+  <div class="ctext">Airlines are a clean beneficiary of the crude collapse — jet fuel is 20–30% of costs. The US–Iran deal and Hormuz reopening have pushed WTI to ~$76, easing the single biggest input cost.</div>
+</div>
+        <div style="font-size:0.75rem;color:var(--muted);margin:12px 0 8px;">🇮🇳 India Stocks (Broad)</div>
+<div class="global-card rise">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">BPCL</div><div class="cname">Bharat Petroleum</div></div>
+    <div class="price-block"><div class="price">—</div><span class="score-pill pos">Score +5</span></div>
+  </div>
+  <div class="badge-row"><span class="badge b-geo">🌐 Geopolitical</span></div>
+  <div class="ctext">India imports ~85% of its crude, so the oil collapse is a macro windfall for oil-marketing companies — lower input costs and friendlier marketing margins. A textbook importer-wins trade.</div>
+</div>
+<div class="global-card rise">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">INDIGO</div><div class="cname">InterGlobe Aviation</div></div>
+    <div class="price-block"><div class="price">—</div><span class="score-pill pos">Score +4</span></div>
+  </div>
+  <div class="badge-row"><span class="badge b-geo">🌐 Geopolitical</span></div>
+  <div class="ctext">Lower ATF (aviation turbine fuel) from the crude reset directly lifts airline margins; IndiGo is the most leveraged listed play on cheaper fuel.</div>
+</div>
+<div class="global-card rise">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">ASIANPAINT</div><div class="cname">Asian Paints</div></div>
+    <div class="price-block"><div class="price">—</div><span class="score-pill pos">Score +3</span></div>
+  </div>
+  <div class="badge-row"><span class="badge b-geo">🌐 Geopolitical</span></div>
+  <div class="ctext">Crude derivatives are key raw materials for paints; a sustained oil-price drop is a gross-margin tailwind for the paint majors.</div>
+</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="pred-col-title">📉 Likely to Fall Today</div>
+      <div>
+        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;">🇺🇸 US Stocks</div>
+<div class="global-card fall">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">XOM</div><div class="cname">ExxonMobil</div></div>
+    <div class="price-block"><div class="price">—</div><span class="score-pill neg">Score −5</span></div>
+  </div>
+  <div class="badge-row"><span class="badge b-geo">🌐 Geopolitical</span></div>
+  <div class="ctext">Oil majors are the direct victims of the peace dividend: Brent slid below $80 (lowest since March) as the deal lets Iran sell crude immediately and ~100M stranded barrels prepare to flow. Lower realisations pressure upstream earnings.</div>
+</div>
+<div class="global-card fall">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">CVX</div><div class="cname">Chevron</div></div>
+    <div class="price-block"><div class="price">—</div><span class="score-pill neg">Score −4</span></div>
+  </div>
+  <div class="badge-row"><span class="badge b-geo">🌐 Geopolitical</span></div>
+  <div class="ctext">Same oil-price mechanics as Exxon — the rapid crude de-rating on Hormuz reopening weighs on integrated energy names; energy was among the weakest S&P sectors into the deal.</div>
+</div>
+<div class="global-card fall">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">FRO</div><div class="cname">Frontline (tankers)</div></div>
+    <div class="price-block"><div class="price">—</div><span class="score-pill neg">Score −3</span></div>
+  </div>
+  <div class="badge-row"><span class="badge b-geo">🌐 Geopolitical</span></div>
+  <div class="ctext">Tanker rates spiked during the blockade; a normalising Strait of Hormuz removes the war-premium on freight over time. Near-term the stranded-oil gush is a wildcard, but the structural tailwind is fading.</div>
+</div>
+        <div style="font-size:0.75rem;color:var(--muted);margin:12px 0 8px;">🇮🇳 India Stocks (Broad)</div>
+<div class="global-card fall">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">INFY</div><div class="cname">Infosys</div></div>
+    <div class="price-block"><div class="price">−6.48% Fri</div><span class="score-pill neg">Score −5</span></div>
+  </div>
+  
+  <div class="ctext">Worst Sensex loser Friday on the Accenture demand warning. The IT-services demand cloud is likely to linger into Monday across the large-cap pack.</div>
+</div>
+<div class="global-card fall">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">ONGC</div><div class="cname">Oil & Natural Gas Corp</div></div>
+    <div class="price-block"><div class="price">—</div><span class="score-pill neg">Score −4</span></div>
+  </div>
+  <div class="badge-row"><span class="badge b-geo">🌐 Geopolitical</span></div>
+  <div class="ctext">The flip side of cheaper crude: as an upstream producer, ONGC sees weaker realisations when oil falls — the mirror image of the OMC trade.</div>
+</div>
+<div class="global-card fall">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">TCS</div><div class="cname">Tata Consultancy Services</div></div>
+    <div class="price-block"><div class="price">−3.04% Fri</div><span class="score-pill neg">Score −4</span></div>
+  </div>
+  
+  <div class="ctext">Fell with the IT pack on the Accenture read-through; the largest Indian IT name carries index weight and sector sentiment.</div>
+</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-title"><span class="emoji">👀</span> On The Radar</div>
+<div class="global-card rise">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">HDFCBANK</div><div class="cname">HDFC Bank</div></div>
+    <div class="price-block"><div class="price">−2.3% Fri</div><span class="score-pill pos">Score −2</span></div>
+  </div>
+  
+  <div class="ctext">On the radar: fell with the broad market Friday on no single catalyst; a hawkish-Fed/higher-yield backdrop is a mild headwind, but the franchise is well-capitalised. Watch for a stabilisation bounce.</div>
+</div>
+<div class="global-card rise">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">BHARTIARTL</div><div class="cname">Bharti Airtel</div></div>
+    <div class="price-block"><div class="price">+1.8% Fri</div><span class="score-pill pos">Score +2</span></div>
+  </div>
+  
+  <div class="ctext">On the radar: among the few Sensex gainers Friday. Defensive-growth bid holding up while IT and banks wobble.</div>
+</div>
+<div class="global-card fall">
+  <div class="card-top">
+    <div class="ticker-block"><div class="ticker">NVDA-AMD-MU</div><div class="cname">US semis (AMD, Micron)</div></div>
+    <div class="price-block"><div class="price">—</div><span class="score-pill neg">Score −1</span></div>
+  </div>
+  
+  <div class="ctext">On the radar: the AI-chip complex remains twitchy after early-June’s 10%+ one-day SMH drop and the Broadcom outlook scare — high beta in both directions.</div>
+</div>
+</div>
+
+<!-- ═══ TAB: GEOPOLITICAL ═══ -->
+<div id="tab-geopolitical" class="section">
+  <div class="section-title"><span class="emoji">🌐</span> Geopolitical Impact — Active Themes Today</div>
+<div class="geo-card">
+  <div class="geo-theme"><span class="icon">🛢️</span> US–Iran peace framework &amp; the oil collapse — the dominant market driver</div>
+  <div class="ctext">A 14-point US–Iran memorandum of understanding (reached 14–15 Jun, signing in Switzerland) extends the ceasefire ~60 days, reopens the Strait of Hormuz toll-free and lifts the US naval blockade. Crucially, Iran can sell crude immediately with sanctions relief. Brent fell ~5% to below $80 — its lowest since early March — and WTI to ~$76, after oil had spiked &gt;50% during the late-Feb war. Analysts caution it could take 3–6 months to fully normalise flows and the deal is a framework, not a final treaty. For oil-importing India this is a clean macro positive (current account, inflation, INR).</div>
+  <div class="geo-sub">Beneficiaries</div><div class="geo-item"><span class="geo-win">▲ Indian OMCs / importers</span> BPCL, HPCL, IOC — lower crude, better marketing margins</div><div class="geo-item"><span class="geo-win">▲ Airlines</span> INDIGO, US carriers DAL/UAL/AAL — jet fuel is 20–30% of costs</div><div class="geo-item"><span class="geo-win">▲ Crude-input consumers</span> ASIANPAINT (paints), MRF/Apollo (tyres); US consumer cyclicals</div>
+  <div class="geo-sub">Victims</div><div class="geo-item"><span class="geo-lose">▼ Oil producers</span> XOM, CVX, OXY, ONGC, OIL — weaker realisations</div><div class="geo-item"><span class="geo-lose">▼ Oilfield services / tankers</span> SLB; FRO, STNG as Hormuz war-premium fades</div><div class="geo-item"><span class="geo-lose">▼ Gold / safe-havens</span> Risk-off unwind pressures gold after its war-time run</div>
+  <div class="geo-sub">Sources</div><div class="ctext"><a href="https://www.nbcnews.com/news/us-news/deal-reached-united-states-iran-war-rcna350039" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;">NBC News</a> &nbsp;·&nbsp; <a href="https://www.cnbc.com/2026/06/16/us-iran-peace-agreement-oil-prices-tankers-strait-of-hormuz-transit.html" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;">CNBC</a> &nbsp;·&nbsp; <a href="https://www.aljazeera.com/economy/2026/6/17/oil-prices-continue-slide-amid-hopes-for-peace-opening-of-strait-of-hormuz" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;">Al Jazeera</a></div>
+</div>
+<div class="geo-card">
+  <div class="geo-theme"><span class="icon">🏦</span> Hawkish Fed under new chair Kevin Warsh</div>
+  <div class="ctext">At its first meeting chaired by Kevin Warsh (17 Jun) the Fed held rates but signalled at least one possible hike later in 2026 to tamp inflation; Treasury yields surged and stocks sold off that day before rebounding on the Iran deal. A stronger-than-expected May jobs report (172k vs ~80k expected, partly World-Cup-related hiring) reinforced the hawkish tilt. Higher US yields are a mild headwind for emerging-market flows, including India.</div>
+  <div class="geo-sub">Beneficiaries</div><div class="geo-item"><span class="geo-win">▲ US dollar</span> Higher-for-longer rate expectations support USD</div><div class="geo-item"><span class="geo-win">▲ US IT services exporters (INR cost base)</span> A firmer dollar helps INFY/TCS USD revenue — but offset now by demand fears</div><div class="geo-item"><span class="geo-win">▲ Cash-rich balance sheets</span> Less reliant on cheap funding</div>
+  <div class="geo-sub">Victims</div><div class="geo-item"><span class="geo-lose">▼ Rate-sensitive growth / long-duration tech</span> Higher discount rates pressure valuations</div><div class="geo-item"><span class="geo-lose">▼ Emerging-market equities</span> EM flows wobble on a hawkish Fed + firmer USD</div><div class="geo-item"><span class="geo-lose">▼ Gold</span> Higher real yields are a headwind</div>
+  <div class="geo-sub">Sources</div><div class="ctext"><a href="https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-june-18-2026" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;">TheStreet</a> &nbsp;·&nbsp; <a href="https://www.cnbc.com/2026/06/16/stock-market-today-live-updates.html" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;">CNBC</a></div>
+</div>
+<div class="geo-card">
+  <div class="geo-theme"><span class="icon">🏭</span> US chip reshoring — Intel to make Apple chips in America</div>
+  <div class="ctext">President Trump said Intel would manufacture chips for Apple in the US, sending Intel up ~10.6% on Thursday. It crystallises the “made-in-America” semiconductor push — a tailwind for US domestic fabs and a structural angle for India’s own electronics-manufacturing “China+1” names.</div>
+  <div class="geo-sub">Beneficiaries</div><div class="geo-item"><span class="geo-win">▲ US domestic fabs</span> INTC and the reshoring supply chain</div><div class="geo-item"><span class="geo-win">▲ India electronics manufacturing (China+1)</span> DIXON, KAYNES, AMBER</div><div class="geo-item"><span class="geo-win">▲ Chip-equipment makers</span> AMAT, LRCX, KLAC (re-shoring capex)</div>
+  <div class="geo-sub">Victims</div><div class="geo-item"><span class="geo-lose">▼ China-exposed US semis</span> NVDA/AMD/QCOM on any tightening of export terms</div><div class="geo-item"><span class="geo-lose">▼ US-listed China ADRs</span> BABA, PDD on decoupling headlines</div>
+  <div class="geo-sub">Sources</div><div class="ctext"><a href="https://tradingeconomics.com/united-states/stock-market" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none;">Trading Economics</a></div>
+</div>
+</div>
+
+<!-- ═══ TAB: US NEWS ═══ -->
+<div id="tab-usnews" class="section">
+  <div class="section-title"><span class="emoji">🇺🇸</span> US Market News Today</div>
+<div class="news-card"><div class="nhead">Relief rally Thursday as Iran deal offsets a hawkish Fed</div><div class="nbody">In the last US session before the Juneteenth holiday, the S&P 500 rose ~1% and the Nasdaq 100 ~1.9%, with the Dow up modestly. Tech and cyclicals led; energy lagged as crude fell on the US–Iran MoU and Hormuz reopening.</div><div class="nsrc">Source: <a href="https://tradingeconomics.com/united-states/stock-market" target="_blank" rel="noopener">Trading Economics</a></div></div>
+<div class="news-card"><div class="nhead">Intel jumps ~10.6% on Apple chip-production news</div><div class="nbody">Intel surged after Trump said the chipmaker would produce chips for Apple in the US — the standout single-stock move of the session and a marker of the reshoring theme.</div><div class="nsrc">Source: <a href="https://tradingeconomics.com/united-states/stock-market" target="_blank" rel="noopener">Trading Economics</a></div></div>
+<div class="news-card"><div class="nhead">Fed holds but leans hawkish at Warsh’s first meeting</div><div class="nbody">The Fed kept rates steady on 17 Jun; about half of officials signalled at least one possible hike this year. Yields spiked and stocks fell that day before recovering Thursday.</div><div class="nsrc">Source: <a href="https://www.cnbc.com/2026/06/16/stock-market-today-live-updates.html" target="_blank" rel="noopener">CNBC</a></div></div>
+<div class="news-card"><div class="nhead">Context: early-June chip rout has left semis twitchy</div><div class="nbody">Two weeks ago the Nasdaq had its worst day since the 2025 tariff turmoil on a violent chip sell-off (SMH −10% in a day) after a soft Broadcom AI outlook. The complex remains high-beta in both directions.</div><div class="nsrc">Source: <a href="https://www.cnbc.com/2026/06/04/stock-market-today-live-updates.html" target="_blank" rel="noopener">CNBC</a></div></div>
+</div>
+
+<!-- ═══ TAB: INDIA NEWS ═══ -->
+<div id="tab-indianews" class="section">
+  <div class="section-title"><span class="emoji">🇮🇳</span> India Market News Today</div>
+<div class="news-card"><div class="nhead">Sensex slips 0.78% Friday, snapping a 5-day run; still +1.7% on the week</div><div class="nbody">The Sensex closed at 76,803 (−607 pts) as IT dragged after Accenture’s guidance cut. Infosys −6.48%, TCS −3.04%, HCL Tech −2.73%, with HDFC Bank and M&M also among laggards. Eternal, Bharti Airtel, Power Grid and NTPC bucked the trend. GIFT Nifty pointed ~0.3% higher for Monday.</div><div class="nsrc">Source: <a href="https://tradingeconomics.com/india/stock-market" target="_blank" rel="noopener">Trading Economics</a></div></div>
+<div class="news-card"><div class="nhead">FIIs net buyers, DIIs net sellers on Friday</div><div class="nbody">Provisional flows showed FIIs bought ~₹4,859 Cr while DIIs sold ~₹1,159 Cr on 19 Jun — a supportive foreign-flow backdrop into Monday.</div><div class="nsrc">Source: <a href="https://trendlyne.com/markets-today/" target="_blank" rel="noopener">Trendlyne</a></div></div>
+<div class="news-card"><div class="nhead">Defence order flow stays hot</div><div class="nbody">HAL (₹2,312 Cr Dornier + ₹2,901 Cr ALH), Bharat Forge (₹425 Cr Navy GTGs) and Goodluck’s defence arm (₹255 Cr shells) all logged fresh orders; FY26 defence output crossed ₹1.78 lakh crore (+15.6% YoY).</div><div class="nsrc">Source: <a href="https://www.newsonprojects.com/country?country=3&industry=306" target="_blank" rel="noopener">News on Projects</a></div></div>
+<div class="news-card"><div class="nhead">Corporate actions: Bajaj Auto buyback, Jio Platforms IPO draft</div><div class="nbody">Bajaj Auto’s board approved a ₹5,632.8 Cr buyback (record date 24 Jun); Reliance arm Jio Platforms cleared its IPO draft (27 cr fresh shares). Geojit also upgraded Ramco Cements to Buy on infra-led demand.</div><div class="nsrc">Source: <a href="https://trendlyne.com/markets-today/" target="_blank" rel="noopener">Trendlyne</a></div></div>
+<div class="news-card"><div class="nhead">Macro tailwind: cheaper crude eases India’s import bill</div><div class="nbody">With WTI around $76 post-deal, India’s current-account and inflation outlook improves — a structural positive for OMCs, airlines and crude-input consumers, and for the rupee.</div><div class="nsrc">Source: <a href="https://www.aljazeera.com/economy/2026/6/17/oil-prices-continue-slide-amid-hopes-for-peace-opening-of-strait-of-hormuz" target="_blank" rel="noopener">Al Jazeera</a></div></div>
+</div>
+
+<!-- ═══ TAB: FUNDAMENTALS ═══ -->
+<div id="tab-fundamentals" class="section">
+  <div class="section-title"><span class="emoji">📋</span> Fundamentals Appendix — All Stocks Analyzed</div>
+  <div class="tbl-wrap">
+    <table id="fundTable">
+      <thead><tr>
+        <th onclick="sortTable('fundTable',0)">Ticker</th>
+        <th onclick="sortTable('fundTable',1)">Company</th>
+        <th onclick="sortTable('fundTable',2)">Market</th>
+        <th onclick="sortTable('fundTable',3)">Cap Tier</th>
+        <th onclick="sortTable('fundTable',4)">Mkt Cap</th>
+        <th onclick="sortTable('fundTable',5)">Price</th>
+        <th onclick="sortTable('fundTable',6)">P/E</th>
+        <th onclick="sortTable('fundTable',7)">P/B</th>
+        <th onclick="sortTable('fundTable',8)">EPS TTM</th>
+        <th onclick="sortTable('fundTable',9)">Revenue TTM</th>
+        <th onclick="sortTable('fundTable',10)">D/E</th>
+        <th onclick="sortTable('fundTable',11)">ROE</th>
+        <th onclick="sortTable('fundTable',12)">52W High</th>
+        <th onclick="sortTable('fundTable',13)">52W Low</th>
+        <th onclick="sortTable('fundTable',14)">ISS / Score</th>
+        <th onclick="sortTable('fundTable',15)">Catalyst</th>
+      </tr></thead>
+      <tbody>
+<tr><td>BHARATFORG</td><td>Bharat Forge</td><td>India</td><td>Large</td><td>₹97,597 Cr</td><td>₹2,041.4</td><td>~42–119</td><td>~10.2</td><td>—</td><td>₹16,812 Cr</td><td>—</td><td>12.4%</td><td>₹2,059</td><td>₹1,100</td><td>ISS 15</td><td>Order Win</td></tr>
+<tr><td>HAL</td><td>Hindustan Aeronautics</td><td>India</td><td>Large</td><td>₹2,95,030 Cr</td><td>₹4,406</td><td>32.5</td><td>7.19</td><td>136.3</td><td>₹33,089 Cr</td><td>Low</td><td>—</td><td>₹5,068</td><td>₹3,479</td><td>ISS 18</td><td>Order Win</td></tr>
+<tr><td>BAJAJ-AUTO</td><td>Bajaj Auto</td><td>India</td><td>Large</td><td>—</td><td>verify</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>ISS 13</td><td>Buyback</td></tr>
+<tr><td>RELIANCE</td><td>Reliance Industries</td><td>India</td><td>Large</td><td>—</td><td>verify</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>ISS 12</td><td>Corp Action</td></tr>
+<tr><td>INFY</td><td>Infosys</td><td>India</td><td>Large</td><td>—</td><td>−6.48% Fri</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>📉 Fall</td><td>IT/Accenture</td></tr>
+<tr><td>KNRCON</td><td>KNR Constructions</td><td>India</td><td>Mid</td><td>—</td><td>verify</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>ISS 15</td><td>Order Win</td></tr>
+<tr><td>MAHLIFE</td><td>Mahindra Lifespaces</td><td>India</td><td>Mid</td><td>—</td><td>verify</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>ISS 11</td><td>Project Add</td></tr>
+<tr><td>MTAR</td><td>MTAR Technologies</td><td>India</td><td>Mid</td><td>—</td><td>+3.1% Fri</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>ISS 11</td><td>Momentum</td></tr>
+<tr><td>BIRLASOFT</td><td>Birlasoft</td><td>India</td><td>Mid</td><td>—</td><td>verify</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>📉 Fall</td><td>IT/Accenture</td></tr>
+<tr><td>RAJESHEXPO</td><td>Rajesh Exports</td><td>India</td><td>Mid?</td><td>verify</td><td>verify</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>📉 Fall</td><td>SEBI flag</td></tr>
+<tr><td>GOODLUCK</td><td>Goodluck India</td><td>India</td><td>Small</td><td>—</td><td>verify</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>ISS 14</td><td>Order Win</td></tr>
+<tr><td>PARAS</td><td>Paras Defence</td><td>India</td><td>Small</td><td>~₹4,000 Cr</td><td>~₹900</td><td>—</td><td>—</td><td>—</td><td>₹171 Cr (Q4)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>ISS 15</td><td>Order + Mom</td></tr>
+<tr><td>ARFIN</td><td>Arfin India</td><td>India</td><td>Small</td><td>—</td><td>verify</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>ISS 12</td><td>Order Win</td></tr>
+<tr><td>MICEL</td><td>MIC Electronics</td><td>India</td><td>Small</td><td>—</td><td>verify</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>ISS 13</td><td>Order Win</td></tr>
+<tr><td>3IINFOTECH</td><td>3i Infotech</td><td>India</td><td>Small</td><td>—</td><td>verify</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>ISS 11</td><td>Order Win</td></tr>
+<tr><td>INTC</td><td>Intel</td><td>US</td><td>Large</td><td>—</td><td>+10.6% Thu</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>+7</td><td>Reshoring 🌐</td></tr>
+<tr><td>NVDA</td><td>NVIDIA</td><td>US</td><td>Large</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>+6</td><td>AI capex</td></tr>
+<tr><td>DAL</td><td>Delta Air Lines</td><td>US</td><td>Large</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>+4</td><td>Lower oil 🌐</td></tr>
+<tr><td>XOM</td><td>ExxonMobil</td><td>US</td><td>Large</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>−5</td><td>Oil drop 🌐</td></tr>
+<tr><td>CVX</td><td>Chevron</td><td>US</td><td>Large</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>−4</td><td>Oil drop 🌐</td></tr>
+<tr><td>FRO</td><td>Frontline</td><td>US</td><td>Mid</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>−3</td><td>Tankers 🌐</td></tr>
+<tr><td>BPCL</td><td>Bharat Petroleum</td><td>India</td><td>Large</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>+5</td><td>Oil import 🌐</td></tr>
+<tr><td>INDIGO</td><td>InterGlobe Aviation</td><td>India</td><td>Large</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>+4</td><td>Lower ATF 🌐</td></tr>
+<tr><td>ASIANPAINT</td><td>Asian Paints</td><td>India</td><td>Large</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>+3</td><td>Crude input 🌐</td></tr>
+<tr><td>ONGC</td><td>Oil & Natural Gas</td><td>India</td><td>Large</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>−4</td><td>Lower crude 🌐</td></tr>
+<tr><td>TCS</td><td>Tata Consultancy</td><td>India</td><td>Large</td><td>—</td><td>−3.04% Fri</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>−4</td><td>IT/Accenture</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="disclaimer">
+    <strong>⚠️ FOR INFORMATIONAL PURPOSES ONLY.</strong> This report is generated from public news sources, social media signals, exchange filings, and financial data. It is <strong>NOT investment advice</strong>. Intraday picks are for intraday use only — they are not recommendations for swing or long-term positions. Stock predictions are inherently uncertain; geopolitical events are particularly difficult to forecast. Reversal candidates carry additional risk from prior negative momentum. Always verify exchange filings directly on NSE/BSE before trading. Do your own research and consult a SEBI-registered or licensed financial advisor before making investment decisions.
+  </div>
+</div>
+
+<script>
+  /* ── Tab switching ── */
+  function showTab(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+
+  /* ── Theme toggle ── */
+  function toggleTheme() {
+    const html = document.documentElement;
+    const dark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', dark ? 'light' : 'dark');
+    document.querySelector('.theme-btn').textContent = dark ? '🌙 Dark' : '☀️ Light';
+  }
+
+  /* ── Sortable tables ── */
+  function sortTable(tableId, col) {
+    const table = document.getElementById(tableId);
+    const tbody = table.querySelector('tbody');
+    const rows  = Array.from(tbody.querySelectorAll('tr'));
+    const th    = table.querySelectorAll('th')[col];
+    const allTh = table.querySelectorAll('th');
+    const asc   = th.classList.contains('asc');
+    allTh.forEach(h => h.classList.remove('asc','desc'));
+    th.classList.toggle('asc', !asc);
+    th.classList.toggle('desc', asc);
+    rows.sort((a, b) => {
+      const av = a.cells[col]?.textContent.trim() || '';
+      const bv = b.cells[col]?.textContent.trim() || '';
+      const an = parseFloat(av.replace(/[^0-9.-]/g,''));
+      const bn = parseFloat(bv.replace(/[^0-9.-]/g,''));
+      if (!isNaN(an) && !isNaN(bn)) return asc ? bn - an : an - bn;
+      return asc ? bv.localeCompare(av) : av.localeCompare(bv);
+    });
+    rows.forEach(r => tbody.appendChild(r));
+  }
+</script>
+</body>
+</html>
